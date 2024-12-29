@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "c:\\Users\\keffi\\Documents\\C++\\Inviduella_Algoritmer",
+            "binaryPath": "c:\\Users\\keffi\\Documents\\C++\\Inviduella_Algoritmer\\main.exe",
+            "binaryArgs": []
+        }
+    ]
+}
