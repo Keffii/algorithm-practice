@@ -33,11 +33,11 @@ public:
 };
 
 void FillData(vector<SensorData> &v);
-time_t CreateTime(int year, int month, int day, int hour, int minute, int second);
+time_t CreateTime(int year, int month, int day);
 
-bool CheckMaxSpeedReached(const vector<SensorData>& sensorData) {
-	for (const auto& sensor : sensorData) {
-		if (sensor.GetSensorType() == SensorType::SpeedInKmh && sensor.GetValue() > 99.9f) {
+bool CheckMaxSpeedReached(const vector<SensorData>& sensorData){
+	for(const auto& sensor : sensorData){
+		if(sensor.GetSensorType() == SensorType::SpeedInKmh && sensor.GetValue() > 99.9f){
 			return true;
 		}
 	}
@@ -49,13 +49,26 @@ int main()
 	vector<SensorData> sensorData;
 	FillData(sensorData);
 
+	// Count how many sensor readings for altitude on 2012-01-02
+	int altitudeCount = 0;
+	time_t startTime = CreateTime(2012, 1, 2);
+	time_t endTime = CreateTime(2012, 1, 3);
+	for(auto& sensor : sensorData){
+		if(sensor.GetSensorType() == SensorType::Altitude &&
+			sensor.GetTime() >= startTime && sensor.GetTime() < endTime)
+		{
+			altitudeCount++;
+		}
+	}
+	cout << "Amount of altitude readings on 2012-01-02: " << altitudeCount << endl;
+
 	// Find latest fuel consumption reading
     time_t latestTime = 0;
     SensorData* latestFuelSensor = nullptr;
 
-    for (auto& sensor : sensorData) {
-        if (sensor.GetSensorType() == SensorType::FuelConsumption) {
-            if (sensor.GetTime() > latestTime) {
+    for(auto& sensor : sensorData){
+        if(sensor.GetSensorType() == SensorType::FuelConsumption){
+            if(sensor.GetTime() > latestTime){
                 latestTime = sensor.GetTime();
                 latestFuelSensor = &sensor;
             }
@@ -63,7 +76,7 @@ int main()
     }
 
     // Update fuel consumption by 75%
-    if (latestFuelSensor != nullptr) {
+    if(latestFuelSensor != nullptr){
         float currentValue = latestFuelSensor->GetValue();
         float newValue = currentValue * 1.75f;  // Increase by 75%
         latestFuelSensor->SetValue(newValue);
@@ -72,9 +85,9 @@ int main()
     }
 
 	// Check for SpeedInKmh over 99.9
-	if (CheckMaxSpeedReached(sensorData)) {
+	if(CheckMaxSpeedReached(sensorData)){
 		cout << "Maxhastighet uppnådd" << endl;
-	} else {
+	}else{
 		cout << "Ingen maxhastighet uppnådd" << endl;
 	}
 
@@ -85,7 +98,7 @@ void FillData(vector<SensorData>& v)
 {
 	srand(time(NULL));
 
-	time_t tid = CreateTime(2012, 1, 1, 1, 1, 1);
+	time_t tid = CreateTime(2012, 1, 1);
 	for (int i = 0; i < 100000; i++)
 	{
 		SensorType type = static_cast<SensorType>(rand() % 3);
@@ -105,14 +118,14 @@ void FillData(vector<SensorData>& v)
 	}
 }
 
-time_t CreateTime(int year, int month, int day, int hour, int minute, int second)
+time_t CreateTime(int year, int month, int day)
 {
 	struct tm tid = { 0 };
 	tid.tm_year = year - 1900;
 	tid.tm_mon = month - 1;
 	tid.tm_mday = day;
-	tid.tm_hour = hour;
-	tid.tm_min = minute;
-	tid.tm_sec = second;
+	// tid.tm_hour = hour;
+	// tid.tm_min = minute;
+	// tid.tm_sec = second;
 	return mktime(&tid);
 }

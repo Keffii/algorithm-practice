@@ -5,5 +5,10 @@
             "binaryPath": "c:\\Users\\keffi\\Documents\\C++\\Inviduella_Algoritmer\\main.exe",
             "binaryArgs": []
         }
-    ]
+    ],
+    "files.associations": {
+        "algorithm": "cpp",
+        "format": "cpp",
+        "iostream": "cpp"
+    }
 }
