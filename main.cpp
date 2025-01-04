@@ -3,9 +3,11 @@
 #include "healthcaresimulator.h"
 #include "atm.h"
 
+
 int main(){
-	// runAllParts();
+	runAllParts();
 	// healthCareSimulator();
-	atm();
+	// atm();
+	// hockeyPlayers();
 	return 0;
 }

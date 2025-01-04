@@ -50,16 +50,12 @@ void runAllParts()
 	FillData(sensorData);
 
 	// Count how many sensor readings for altitude on 2012-01-02
-	int altitudeCount = 0;
-	time_t startTime = CreateTime(2012, 1, 2);
-	time_t endTime = CreateTime(2012, 1, 3);
-	for(auto& sensor : sensorData){
-		if(sensor.GetSensorType() == SensorType::Altitude &&
-			sensor.GetTime() >= startTime && sensor.GetTime() < endTime)
-		{
-			altitudeCount++;
-		}
-	}
+	int altitudeCount = std::count_if(sensorData.begin(), sensorData.end(), [](const SensorData& sensor) {
+		time_t startTime = CreateTime(2012, 1, 2);
+		time_t endTime = CreateTime(2012, 1, 3);
+		return sensor.GetSensorType() == SensorType::Altitude &&
+			   sensor.GetTime() >= startTime && sensor.GetTime() < endTime;
+	});
 	cout << "Amount of altitude readings on 2012-01-02: " << altitudeCount << endl;
 
 	// Find latest fuel consumption reading

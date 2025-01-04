@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-void atm() {
+void atm(){
     std::map<int, double> accounts;
     int currentAccount = -1;
     bool isLoggedIn = false;

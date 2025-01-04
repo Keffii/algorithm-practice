@@ -4,6 +4,11 @@
             "cwd": "c:\\Users\\keffi\\Documents\\C++\\Inviduella_Algoritmer",
             "binaryPath": "c:\\Users\\keffi\\Documents\\C++\\Inviduella_Algoritmer\\main.exe",
             "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\Kevin_Laptop\\Documents\\C++\\Inviduella_Algoritmer\\Inviduella_Algoritmer",
+            "binaryPath": "c:\\Users\\Kevin_Laptop\\Documents\\C++\\Inviduella_Algoritmer\\Inviduella_Algoritmer\\main.exe",
+            "binaryArgs": []
         }
     ],
     "files.associations": {
@@ -57,6 +62,8 @@
         "streambuf": "cpp",
         "text_encoding": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "list": "cpp",
+        "fstream": "cpp"
     }
 }
