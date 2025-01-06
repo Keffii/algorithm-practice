@@ -1,5 +1,5 @@
 PROG = main.exe 
-SRC = main.cpp del1_2_3.cpp healthcaresimulator.cpp atm.cpp
+SRC = main.cpp del1_2_3.cpp healthcaresimulator.cpp atm.cpp hockeyplayers.cpp
 CFLAGS = -g -std=c++17
 LIBS = 
 CC=g++

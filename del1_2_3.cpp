@@ -35,13 +35,12 @@ public:
 void FillData(vector<SensorData> &v);
 time_t CreateTime(int year, int month, int day);
 
-bool CheckMaxSpeedReached(const vector<SensorData>& sensorData){
-	for(const auto& sensor : sensorData){
-		if(sensor.GetSensorType() == SensorType::SpeedInKmh && sensor.GetValue() > 99.9f){
-			return true;
-		}
-	}
-	return false;
+bool CheckMaxSpeedReached(const vector<SensorData>& sensorData) {
+	return std::any_of(sensorData.begin(), sensorData.end(), 
+		[](const SensorData& sensor) {
+			return sensor.GetSensorType() == SensorType::SpeedInKmh && 
+				   sensor.GetValue() > 99.9f;
+		});
 }
 
 void runAllParts()
@@ -49,7 +48,6 @@ void runAllParts()
 	vector<SensorData> sensorData;
 	FillData(sensorData);
 
-	// Count how many sensor readings for altitude on 2012-01-02
 	int altitudeCount = std::count_if(sensorData.begin(), sensorData.end(), [](const SensorData& sensor) {
 		time_t startTime = CreateTime(2012, 1, 2);
 		time_t endTime = CreateTime(2012, 1, 3);
@@ -58,29 +56,27 @@ void runAllParts()
 	});
 	cout << "Amount of altitude readings on 2012-01-02: " << altitudeCount << endl;
 
-	// Find latest fuel consumption reading
     time_t latestTime = 0;
     SensorData* latestFuelSensor = nullptr;
 
-    for(auto& sensor : sensorData){
-        if(sensor.GetSensorType() == SensorType::FuelConsumption){
-            if(sensor.GetTime() > latestTime){
-                latestTime = sensor.GetTime();
-                latestFuelSensor = &sensor;
-            }
-        }
-    }
+	std::sort(sensorData.begin(), sensorData.end(), 
+		[](const SensorData& a, const SensorData& b) {
+			return a.GetTime() > b.GetTime();
+		});
 
-    // Update fuel consumption by 75%
-    if(latestFuelSensor != nullptr){
-        float currentValue = latestFuelSensor->GetValue();
-        float newValue = currentValue * 1.75f;  // Increase by 75%
-        latestFuelSensor->SetValue(newValue);
-        cout << "Previous fuel consumption: " << currentValue << endl;
-        cout << "Updated fuel consumption: " << newValue << endl;
-    }
+	auto it = std::find_if(sensorData.begin(), sensorData.end(),
+		[](const SensorData& sensor) {
+			return sensor.GetSensorType() == SensorType::FuelConsumption;
+		});
 
-	// Check for SpeedInKmh over 99.9
+	if (it != sensorData.end()) {
+		float currentValue = it->GetValue();
+		float newValue = currentValue * 1.75f;
+		it->SetValue(newValue);
+		cout << "Previous fuel consumption: " << currentValue << endl;
+		cout << "Updated fuel consumption: " << newValue << endl;
+	}
+	
 	if(CheckMaxSpeedReached(sensorData)){
 		cout << "Maxhastighet uppnådd" << endl;
 	}else{

@@ -1,53 +1,109 @@
-#include <iostream> 
-#include <cstdlib> 
-#include <ctime> 
-#include <vector> 
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
 #include <fstream>
+#include <sstream>
+#include <string>
+#include <algorithm>
 
-class hockeyPlayer{
-    public:
-    int id;
-    std::string Player;
-    int jersey;
-    std::string teamName;
-};
-
-//Tänk på ett nattduksbord och flytta runt i vector använd least recently used.
-//Om spelaren finns i vectorn, flytta den till första platsen och returna.
-//Om spelaren inte finns i vectorn, lägg till den på första platsen och ta bort den sista.
-//Om vectorn är full, ta bort den sista.
-//Sök efter ID med GetPlayer bland de 10k spelarna i filen hockeyplayers.txt.
-
-
-
-class LRUCache{
+class HockeyPlayer {
 public:
-     Player *GetPlayer(int id);
-private:
-    hockeyPlayer cache[10];
+    int id;
+    int jersey;
+    std::string name;
+    std::string teamName;
+    
+    HockeyPlayer(int _id = 0, std::string _name = "", int _jersey = 0, std::string _team = "") 
+        : id(_id), name(_name), jersey(_jersey), teamName(_team) {}
 };
 
-void hockeyPlayers(){ 
-    srand(time(0));
+class LRUCache {
+private:
+    std::vector<HockeyPlayer> cache;
+    const int MAX_SIZE = 10;
+    
+    HockeyPlayer readPlayerFromFile(int id) {
+        std::ifstream file("hockeyplayers.txt");
+        std::string line;
+        
+        while (getline(file, line)) {
+            std::istringstream iss(line);
+            int playerId;
+            int jersey;
+            std::string name;
+            std::string team;
+            
+            if (iss >> playerId) {
+                std::getline(iss, name, '"');
+                std::getline(iss, name, '"');
+                iss >> jersey >> team;
+                if (playerId == id) {
+                    return HockeyPlayer(playerId, name, jersey, team);
+                }
+            }
+        }
+        return HockeyPlayer();
+    }
 
-    std::vector<std::string> firstNames = {"Henrik", "Erik", "Lars", "Johan", "Anders"}; 
-    std::vector<std::string> lastNames = {"Svensson", "Johansson", "Karlsson", "Nilsson", "Larsson"}; 
+public:
+    HockeyPlayer* GetPlayer(int id) {
+        for (auto it = cache.begin(); it != cache.end(); ++it) {
+            if (it->id == id) {
+                HockeyPlayer player = *it;
+                cache.erase(it);
+                cache.insert(cache.begin(), player);
+                return &cache[0];
+            }
+        }
+        
+        HockeyPlayer player = readPlayerFromFile(id);
+        if (player.id == 0) return nullptr; 
+        
+        if (cache.size() >= MAX_SIZE) {
+            cache.pop_back();
+        }
+        cache.insert(cache.begin(), player);
+        return &cache[0];
+    }
+};
 
-
+void generatePlayerFile() {
     std::ofstream outFile("hockeyplayers.txt");
-    if(!outFile){
+    if (!outFile) {
         std::cerr << "Error opening file for writing" << std::endl;
         return;
     }
 
-    int numNames = 10000; 
-    for(int i = 0;i < numNames; ++i){ 
-        int firstNameIndex = rand() % firstNames.size();
-        int lastNameIndex = rand() % lastNames.size(); 
+    std::vector<std::string> firstNames = {"Henrik", "Erik", "Lars", "Johan", "Anders"};
+    std::vector<std::string> lastNames = {"Svensson", "Johansson", "Karlsson", "Nilsson", "Larsson"};
+    std::vector<std::string> teamNames = {"Leksands IF", "Frölunda HC", "Djurgårdens IF", "Färjestad BK", "HV71"};
+    int numPlayers = 100000;
 
-        std::string fullName = firstNames[firstNameIndex] + " " + lastNames[lastNameIndex]; 
-        outFile << fullName << std::endl; 
+    srand(time(0));
+    for (int i = 0; i < numPlayers; ++i) {
+        int firstNameIndex = rand() % firstNames.size();
+        int lastNameIndex = rand() % lastNames.size();
+        int teamNameIndex = rand() % teamNames.size();
+        int jerseyNumber = rand() % 23 + 1;
+
+        std::string fullName = firstNames[firstNameIndex] + " " + lastNames[lastNameIndex];
+        outFile << i + 1 << " " << fullName << " " << jerseyNumber << " " << teamNames[teamNameIndex] << std::endl;
     }
 
     outFile.close();
+}
+
+void hockeyPlayers() {
+    generatePlayerFile();
+    LRUCache cache;
+    int playerid;
+    std::cout << "Enter player id: ";
+    std::cin >> playerid;
+    HockeyPlayer* player = cache.GetPlayer(playerid);
+    if (player) {
+        std::cout << "Player found: " << player->name << std::endl;
+    } else {
+        std::cout << "Player not found" << std::endl;
+    }
 }
